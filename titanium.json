@@ -10,13 +10,13 @@
       "initrd_file": "/images/pxeboot/initrd.img",
       "ks_file": "titanium-6.18.03-b9-x86_64/ks.cfg",
 
-      "ssh_username":"packer",
-      "ssh_password":"packer",
+      "ssh_username":"wrsroot",
+      "ssh_password":"wrsroot",
 
       "access_key":"xxx",
       "secret_key":"xxx",
       "region":"us-west-2",
-      "bucket_name":"titanium_output"
+      "bucket_name":"titanium-output"
    },
 
    "builders":[
@@ -31,9 +31,11 @@
 
          "headless": "{{ user `non_gui` }}",
 
-         "output_directory":"builds",
+         "output_directory":"builds/titanium-6.18.03-b9-x86_64",
          "vm_name": "Titanium-Cloud-18.03-b9-x86_64",
          "disk_size":"1000000",
+
+        "communicator": "ssh",
 
          "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
 
@@ -48,9 +50,11 @@
          ],
 
          "vboxmanage": [
-           ["modifyvm", "{{ .Name }}", "--memory", "2048"],
-           ["modifyvm", "{{ .Name }}", "--cpus", "2"],
-           ["modifyvm", "{{ .Name }}", "--vram", "256"]
+           ["modifyvm", "{{ .Name }}", "--memory",         "2048"],
+           ["modifyvm", "{{ .Name }}", "--cpus",           "2"],
+           ["modifyvm", "{{ .Name }}", "--vram",           "256"],
+           ["modifyvm", "{{ .Name }}", "--nic1",           "bridged"],
+           ["modifyvm", "{{ .Name }}", "--bridgeadapter1", "en0"]
          ],
 
          "vboxmanage_post": [
@@ -59,7 +63,7 @@
 
          "ssh_username":"{{ user `ssh_username` }}",
          "ssh_password":"{{ user `ssh_password` }}",
-         "ssh_wait_timeout":"1000s",
+         "ssh_wait_timeout":"20m",
 
          "shutdown_command":"sudo shutdown -h 0",
 

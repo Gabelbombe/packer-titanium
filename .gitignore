@@ -1,4 +1,5 @@
 packer_cache/*
+builds/*
 
 .DS_Store
 *.log
