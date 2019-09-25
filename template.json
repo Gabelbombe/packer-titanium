@@ -1,0 +1,49 @@
+{
+    "builders": [{
+          "type": "vmware-iso",
+          "vm_name": "Titanium-Cloud-18.03-b9-x86_64",
+          "disk_size": 40960,
+
+          "headless": 0,
+          "tools_upload_flavor": "linux",
+          "guest_os_type": "Centos-64",
+
+          "http_directory": "http/titanium-6.18.03-b9_x86_64",
+          "iso_url": "iso/Titanium-Cloud-host-installer-18.03-b9.iso",
+          "iso_checksum": "811b530a87c7d765aca6ebe15ad7f650",
+          "iso_checksum_type": "MD5",
+
+          "shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
+          "output_directory": "output/Titanium-Cloud-host-installer-18.03-b9-x86_64-vmware",
+
+          "ssh_wait_timeout": "10000s",
+          "ssh_password": "vagrant",
+          "ssh_username": "vagrant",
+          "ssh_port": 22,
+
+          "vmx_data": {
+            "cpuid.coresPerSocket":   2,
+            "memsize":                480,
+            "numvcpus":               2
+          },
+
+          "boot_wait": "10s",
+          "boot_command": [
+            "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/titanium-6.18.03-b9-x86_64/ks.cfg<enter><wait>"
+        ]}
+      ],
+
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sudo yum update -y",
+				        "sudo /usr/sbin/update-motd --disable",
+                "echo 'No unauthorized access permitted' | sudo tee /etc/motd",
+                "sudo rm /etc/issue",
+                "sudo ln -s /etc/motd /etc/issue",
+                "sudo yum install -y elinks screen"
+            ]
+        }
+    ]
+}

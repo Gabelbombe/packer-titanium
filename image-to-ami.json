@@ -1,0 +1,86 @@
+{
+   "variables":{
+      "non_gui": "false",
+
+      "iso_url":"Titanium-Cloud-host-installer-18.03-b9.iso",
+      "iso_checksum":"811b530a87c7d765aca6ebe15ad7f650",
+      "type":"md5",
+
+      "vmlinuz_file": "/images/pxeboot/vmlinuz",
+      "initrd_file": "/images/pxeboot/initrd.img",
+      "ks_file": "titanium-6.18.03-b9-x86_64/ks.cfg",
+
+      "ssh_username":"packer",
+      "ssh_password":"packer",
+
+      "access_key":"xxx",
+      "secret_key":"xxx",
+      "region":"us-west-2",
+      "bucket_name":"titanium_output"
+   },
+
+   "builders":[
+      {
+         "type":"virtualbox-iso",
+         "guest_os_type": "Centos_64",
+
+         "http_directory": "http",
+         "iso_url": "iso/{{ user `iso_url` }}",
+         "iso_checksum": "{{ user `iso_checksum` }}",
+         "iso_checksum_type": "{{ user `type` }}",
+
+         "headless": "{{ user `non_gui` }}",
+
+         "output_directory":"builds",
+         "vm_name": "Titanium-Cloud-18.03-b9-x86_64",
+         "disk_size":"1000000",
+
+         "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+
+         "boot_wait":"5s",
+         "http_directory":"http",
+
+         "boot_command": [
+           "text {{user `vmlinuz_file`}} initrd={{user `initrd_file`}} inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{user `ks_file`}}",
+           "<enter><wait>",
+           "<down><enter>",
+           "<enter><wait>"
+         ],
+
+         "vboxmanage": [
+           ["modifyvm", "{{ .Name }}", "--memory", "2048"],
+           ["modifyvm", "{{ .Name }}", "--cpus", "2"],
+           ["modifyvm", "{{ .Name }}", "--vram", "256"]
+         ],
+
+         "vboxmanage_post": [
+           [ "storageattach", "{{ .Name }}", "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--type", "dvddrive", "--medium", "emptydrive" ]
+         ],
+
+         "ssh_username":"{{ user `ssh_username` }}",
+         "ssh_password":"{{ user `ssh_password` }}",
+         "ssh_wait_timeout":"1000s",
+
+         "shutdown_command":"sudo shutdown -h 0",
+
+         "format":"ova"
+      }
+   ],
+
+   "post-processors":[
+      {
+         "type":"amazon-import",
+
+         "access_key":"{{ user `access_key` }}",
+         "secret_key":"{{ user `secret_key` }}",
+         "region":"{{ user `region` }}",
+
+         "s3_bucket_name":"{{ user `bucket_name` }}",
+
+         "license_type":"BYOL",
+         "tags":{
+            "Description":"packer amazon import "
+         }
+      }
+   ]
+}
