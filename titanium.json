@@ -22,7 +22,9 @@
    "builders":[
       {
          "type":"virtualbox-iso",
+
          "guest_os_type": "Centos_64",
+         "guest_additions_path": "iso/VBoxGuestAdditions_6.0.0_RC1.iso",
 
          "http_directory": "http",
          "iso_url": "iso/{{ user `iso_url` }}",
@@ -63,13 +65,23 @@
 
          "ssh_username":"{{ user `ssh_username` }}",
          "ssh_password":"{{ user `ssh_password` }}",
-         "ssh_wait_timeout":"20m",
+         "ssh_wait_timeout":"40m",
 
          "shutdown_command":"sudo shutdown -h 0",
 
          "format":"ova"
       }
    ],
+
+   "provisioners": [
+          {
+              "type": "shell",
+              "script": "scripts/install-virtualbox-guest-additions.sh"
+          }, {
+              "type": "shell",
+              "script": "scripts/clean-empty-space.sh"
+          }
+      ],
 
    "post-processors":[
       {

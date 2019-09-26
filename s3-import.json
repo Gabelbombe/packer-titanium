@@ -1,0 +1,8 @@
+[{
+    "Description": "Titanium Test",
+    "Format": "ova",
+    "UserBucket": {
+        "S3Bucket": "titanium-output",
+        "S3Key": "Titanium-Cloud-18.03-b9-x86_64.ova"
+    }
+}]
